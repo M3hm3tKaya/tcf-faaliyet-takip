@@ -17,52 +17,67 @@ const sendStatus = document.getElementById("send-status");
 
 const WORKER_API = "https://tcf-scraper.mehmetkaya2002.workers.dev";
 const statusEl = document.getElementById("update-status");
+let lastUpdateISO = null;
 
 async function loadFaaliyetler() {
-  listEl.innerHTML = '<div class="loading">Yükleniyor...</div>';
+  if (allFaaliyetler.length === 0) {
+    listEl.innerHTML = '<div class="loading">Yükleniyor...</div>';
+  }
   try {
     let data;
-    try {
-      const resp = await fetch(WORKER_API + "/api/data");
-      data = await resp.json();
-    } catch {
-      const resp = await fetch("/faaliyetler.json");
-      data = await resp.json();
+    const workerResp = await fetch(WORKER_API + "/api/data").catch(() => null);
+    if (workerResp && workerResp.ok) {
+      data = await workerResp.json();
+    } else {
+      const localResp = await fetch("/faaliyetler.json");
+      data = await localResp.json();
     }
-    allFaaliyetler = data.faaliyetler;
-    if (data.son_guncelleme) {
-      showUpdateTime(data.son_guncelleme);
+    if (data.faaliyetler) {
+      allFaaliyetler = data.faaliyetler;
+      updateStats();
+      applyFilters();
     }
-    updateStats();
-    applyFilters();
-    loadStatus();
+    if (data.son_guncelleme) lastUpdateISO = data.son_guncelleme;
   } catch (e) {
-    listEl.innerHTML = '<div class="empty">Veriler yüklenemedi.</div>';
+    if (allFaaliyetler.length === 0) {
+      listEl.innerHTML = '<div class="empty">Veriler yüklenemedi.</div>';
+    }
   }
+  refreshStatus();
 }
 
-async function loadStatus() {
+async function refreshStatus() {
   try {
-    const resp = await fetch(WORKER_API + "/api/status");
-    const data = await resp.json();
-    if (data.son_kontrol) showUpdateTime(data.son_kontrol);
+    const resp = await fetch(WORKER_API + "/api/status").catch(() => null);
+    if (resp && resp.ok) {
+      const data = await resp.json();
+      if (data.son_kontrol) lastUpdateISO = data.son_kontrol;
+    }
   } catch {}
+  showUpdateTime();
 }
 
-function showUpdateTime(iso) {
+function showUpdateTime() {
   if (!statusEl) return;
-  try {
-    const d = new Date(iso);
-    const now = new Date();
-    const diff = Math.floor((now - d) / 60000);
-    let text;
-    if (diff < 1) text = "az önce";
-    else if (diff < 60) text = `${diff} dk önce`;
-    else if (diff < 1440) text = `${Math.floor(diff / 60)} saat önce`;
-    else text = `${Math.floor(diff / 1440)} gün önce`;
-    statusEl.textContent = `Son kontrol: ${text}`;
-  } catch {}
+  if (!lastUpdateISO) {
+    statusEl.textContent = "Son kontrol: henüz yapılmadı";
+    return;
+  }
+  const d = new Date(lastUpdateISO);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 60000);
+  let text;
+  if (diff < 1) text = "az önce";
+  else if (diff < 60) text = `${diff} dk önce`;
+  else if (diff < 1440) text = `${Math.floor(diff / 60)} saat önce`;
+  else text = `${Math.floor(diff / 1440)} gün önce`;
+  const saat = d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  statusEl.textContent = `Son kontrol: ${text} (${saat})`;
 }
+
+// Her 30 saniyede süreyi güncelle, her 60 saniyede veriyi yeniden çek
+setInterval(showUpdateTime, 30000);
+setInterval(loadFaaliyetler, 60000);
 
 function updateStats() {
   statToplam.textContent = allFaaliyetler.length;

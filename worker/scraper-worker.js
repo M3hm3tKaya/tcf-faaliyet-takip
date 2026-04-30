@@ -92,16 +92,26 @@ export default {
   },
 
   async fetch(request, env) {
+    const cors = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    };
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: cors });
+    }
+
     const url = new URL(request.url);
 
     if (url.pathname === "/api/data") {
       const data = await env.TCF_DATA.get("faaliyetler");
-      if (!data) return Response.json({ error: "Veri yok" }, { status: 404 });
-      return new Response(data, { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+      if (!data) return Response.json({ error: "Veri yok" }, { status: 404, headers: cors });
+      return new Response(data, { headers: { "Content-Type": "application/json", ...cors } });
     }
 
     if (url.pathname === "/api/status") {
-      const sonKontrol = await env.TCF_DATA.get("son_kontrol") || "hiç";
+      const sonKontrol = await env.TCF_DATA.get("son_kontrol") || null;
       const sonDegisiklik = await env.TCF_DATA.get("son_degisiklik");
       const faalRaw = await env.TCF_DATA.get("faaliyetler");
       const toplam = faalRaw ? JSON.parse(faalRaw).toplam : 0;
@@ -109,10 +119,10 @@ export default {
         son_kontrol: sonKontrol,
         son_degisiklik: sonDegisiklik ? JSON.parse(sonDegisiklik) : null,
         toplam,
-      }, { headers: { "Access-Control-Allow-Origin": "*" } });
+      }, { headers: cors });
     }
 
-    return new Response("TCF Scraper Worker", { status: 200 });
+    return new Response("TCF Scraper Worker", { status: 200, headers: cors });
   },
 };
 
