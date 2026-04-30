@@ -15,17 +15,53 @@ const btnSend = document.getElementById("btn-send");
 const charCount = document.getElementById("char-count");
 const sendStatus = document.getElementById("send-status");
 
+const WORKER_API = "https://tcf-scraper.mehmetkaya2002.workers.dev";
+const statusEl = document.getElementById("update-status");
+
 async function loadFaaliyetler() {
   listEl.innerHTML = '<div class="loading">Yükleniyor...</div>';
   try {
-    const resp = await fetch("/faaliyetler.json");
-    const data = await resp.json();
+    let data;
+    try {
+      const resp = await fetch(WORKER_API + "/api/data");
+      data = await resp.json();
+    } catch {
+      const resp = await fetch("/faaliyetler.json");
+      data = await resp.json();
+    }
     allFaaliyetler = data.faaliyetler;
+    if (data.son_guncelleme) {
+      showUpdateTime(data.son_guncelleme);
+    }
     updateStats();
     applyFilters();
+    loadStatus();
   } catch (e) {
     listEl.innerHTML = '<div class="empty">Veriler yüklenemedi.</div>';
   }
+}
+
+async function loadStatus() {
+  try {
+    const resp = await fetch(WORKER_API + "/api/status");
+    const data = await resp.json();
+    if (data.son_kontrol) showUpdateTime(data.son_kontrol);
+  } catch {}
+}
+
+function showUpdateTime(iso) {
+  if (!statusEl) return;
+  try {
+    const d = new Date(iso);
+    const now = new Date();
+    const diff = Math.floor((now - d) / 60000);
+    let text;
+    if (diff < 1) text = "az önce";
+    else if (diff < 60) text = `${diff} dk önce`;
+    else if (diff < 1440) text = `${Math.floor(diff / 60)} saat önce`;
+    else text = `${Math.floor(diff / 1440)} gün önce`;
+    statusEl.textContent = `Son kontrol: ${text}`;
+  } catch {}
 }
 
 function updateStats() {

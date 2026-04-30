@@ -329,6 +329,13 @@ body {
   font-size: 0.9rem;
 }
 
+.update-status {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--success);
+  margin-bottom: 4px;
+}
+
 .footer {
   text-align: center;
   padding: 16px 20px 24px;

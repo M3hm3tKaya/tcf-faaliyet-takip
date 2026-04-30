@@ -1,0 +1,11 @@
+name = "tcf-scraper"
+main = "scraper-worker.js"
+compatibility_date = "2024-09-23"
+account_id = "9a812c12aa81214a43766f699b2a76ba"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[[kv_namespaces]]
+binding = "TCF_DATA"
+id = "37d681384bdf4b3dbdd97f523e5c8764"
