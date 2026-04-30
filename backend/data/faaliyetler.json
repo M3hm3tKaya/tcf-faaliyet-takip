@@ -1,7 +1,17 @@
 {
-  "son_guncelleme": "2026-04-30T15:57:31.316029",
-  "toplam": 181,
+  "son_guncelleme": "2026-04-30T13:36:49.683114",
+  "toplam": 182,
   "faaliyetler": [
+    {
+      "slug": "artistik-cimnastik-hazirlik-kampi",
+      "yil": "2026",
+      "kategori": "Kamp",
+      "baslik": "Artistik Cimnastik Hazırlık Kampı",
+      "brans": "Erkek Artistik Cimnastik",
+      "yer": "Antalya",
+      "tarih": "05.05.2026 - 15.05.2026",
+      "detay_url": "https://www.tcf.gov.tr/faaliyetler/artistik-cimnastik-hazirlik-kampi/"
+    },
     {
       "slug": "3-kademe-kidemli-antrenorluk-kursu-25",
       "yil": "2026",
