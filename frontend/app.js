@@ -172,6 +172,17 @@ async function setupPush() {
 
   const reg = await navigator.serviceWorker.register("/sw.js");
 
+  // SW güncelleme kontrolü — her 30 saniyede bir
+  reg.addEventListener("updatefound", () => {
+    const newWorker = reg.installing;
+    newWorker.addEventListener("statechange", () => {
+      if (newWorker.state === "activated") {
+        window.location.reload();
+      }
+    });
+  });
+  setInterval(() => reg.update(), 30000);
+
   const existing = await reg.pushManager.getSubscription();
   if (existing) {
     notifBar.textContent = "Bildirimler aktif";

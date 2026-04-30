@@ -1,8 +1,8 @@
-const CACHE_NAME = "tcf-takip-v1";
-const ASSETS = ["/", "/style.css", "/app.js", "/manifest.json"];
+const CACHE_NAME = "tcf-takip-v2";
+const STATIC_ASSETS = ["/", "/style.css", "/app.js", "/manifest.json", "/icon-192.png"];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE_NAME).then((c) => c.addAll(ASSETS)));
+  e.waitUntil(caches.open(CACHE_NAME).then((c) => c.addAll(STATIC_ASSETS)));
   self.skipWaiting();
 });
 
@@ -16,19 +16,31 @@ self.addEventListener("activate", (e) => {
 });
 
 self.addEventListener("fetch", (e) => {
-  if (e.request.url.includes("/api/")) return;
+  const url = new URL(e.request.url);
+
+  // API, JSON, Worker istekleri → her zaman network
+  if (url.pathname.startsWith("/api/") || url.pathname.endsWith(".json") || url.hostname.includes("workers.dev")) {
+    return;
+  }
+
+  // Statik dosyalar → cache-first, arka planda güncelle
   e.respondWith(
     caches.match(e.request).then((cached) => {
-      const fetched = fetch(e.request).then((resp) => {
+      const networkFetch = fetch(e.request).then((resp) => {
         if (resp.ok) {
           const clone = resp.clone();
           caches.open(CACHE_NAME).then((c) => c.put(e.request, clone));
         }
         return resp;
       });
-      return cached || fetched;
+      return cached || networkFetch;
     })
   );
+});
+
+// Yeni versiyon yüklendiyse tüm client'lara haber ver
+self.addEventListener("message", (e) => {
+  if (e.data === "skipWaiting") self.skipWaiting();
 });
 
 self.addEventListener("push", (e) => {
@@ -53,5 +65,14 @@ self.addEventListener("push", (e) => {
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
   const url = e.notification.data?.url || "/";
-  e.waitUntil(clients.openWindow(url));
+  e.waitUntil(
+    clients.matchAll({ type: "window" }).then((list) => {
+      for (const client of list) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          return client.focus();
+        }
+      }
+      return clients.openWindow(url);
+    })
+  );
 });
