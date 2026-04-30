@@ -1,0 +1,152 @@
+let allFaaliyetler = [];
+let filteredList = [];
+
+const listEl = document.getElementById("list");
+const kategoriEl = document.getElementById("filtre-kategori");
+const bransEl = document.getElementById("filtre-brans");
+const searchEl = document.getElementById("search-input");
+const notifBar = document.getElementById("notif-bar");
+const statToplam = document.getElementById("stat-toplam");
+const statYarisma = document.getElementById("stat-yarisma");
+const statKurs = document.getElementById("stat-kurs");
+const statKamp = document.getElementById("stat-kamp");
+
+async function loadFaaliyetler() {
+  listEl.innerHTML = '<div class="loading">Yükleniyor...</div>';
+  try {
+    let resp = await fetch("/api/faaliyetler").catch(() => null);
+    if (!resp || !resp.ok) {
+      resp = await fetch("/data/faaliyetler.json");
+    }
+    const data = await resp.json();
+    allFaaliyetler = data.faaliyetler;
+    updateStats();
+    applyFilters();
+  } catch (e) {
+    listEl.innerHTML = '<div class="empty">Veriler yüklenemedi.</div>';
+  }
+}
+
+function updateStats() {
+  statToplam.textContent = allFaaliyetler.length;
+  statYarisma.textContent = allFaaliyetler.filter((f) => f.kategori === "Yarışma").length;
+  statKurs.textContent = allFaaliyetler.filter((f) => f.kategori === "Kurs").length;
+  statKamp.textContent = allFaaliyetler.filter((f) => f.kategori === "Kamp").length;
+}
+
+function applyFilters() {
+  const kat = kategoriEl.value;
+  const brans = bransEl.value;
+  const q = searchEl.value.toLowerCase().trim();
+
+  filteredList = allFaaliyetler.filter((f) => {
+    if (kat && f.kategori !== kat) return false;
+    if (brans && f.brans !== brans) return false;
+    if (q) {
+      const haystack = `${f.baslik} ${f.brans} ${f.yer} ${f.kategori}`.toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
+
+  renderList();
+}
+
+function renderList() {
+  if (filteredList.length === 0) {
+    listEl.innerHTML = '<div class="empty">Sonuç bulunamadı.</div>';
+    return;
+  }
+
+  listEl.innerHTML = filteredList
+    .map(
+      (f) => `
+    <a href="${f.detay_url}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
+      <div class="faaliyet-card" data-kategori="${f.kategori}">
+        <div class="baslik">${f.baslik}</div>
+        <div class="meta">
+          <span class="tag tag-kategori">${f.kategori}</span>
+          <span class="tag tag-brans">${f.brans}</span>
+          <span class="tag tag-yer">${f.yer}</span>
+          <span class="tag tag-tarih">${f.tarih}</span>
+        </div>
+      </div>
+    </a>`
+    )
+    .join("");
+}
+
+kategoriEl.addEventListener("change", applyFilters);
+bransEl.addEventListener("change", applyFilters);
+searchEl.addEventListener("input", applyFilters);
+
+document.getElementById("btn-reset").addEventListener("click", () => {
+  kategoriEl.value = "";
+  bransEl.value = "";
+  searchEl.value = "";
+  applyFilters();
+});
+
+// --- Push Notification ---
+
+async function setupPush() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    notifBar.textContent = "Bu tarayıcı bildirimleri desteklemiyor.";
+    notifBar.classList.add("show");
+    return;
+  }
+
+  const reg = await navigator.serviceWorker.register("/sw.js");
+
+  const existing = await reg.pushManager.getSubscription();
+  if (existing) {
+    notifBar.textContent = "Bildirimler aktif";
+    notifBar.classList.add("show", "subscribed");
+    return;
+  }
+
+  notifBar.textContent = "Bildirimleri aç — yeni faaliyetlerden haberdar ol";
+  notifBar.classList.add("show");
+
+  notifBar.addEventListener("click", async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        notifBar.textContent = "Bildirim izni reddedildi.";
+        return;
+      }
+
+      const keyResp = await fetch("/api/vapid-public-key");
+      const { publicKey } = await keyResp.json();
+
+      const subscription = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey),
+      });
+
+      await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subscription.toJSON()),
+      });
+
+      notifBar.textContent = "Bildirimler aktif";
+      notifBar.classList.add("subscribed");
+    } catch (e) {
+      notifBar.textContent = "Bildirim ayarlanamadı: " + e.message;
+    }
+  });
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const raw = atob(base64);
+  const arr = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+
+// --- Init ---
+loadFaaliyetler();
+setupPush();

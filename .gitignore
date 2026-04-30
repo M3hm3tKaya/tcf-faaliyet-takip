@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.env
+backend/data/raw_page.html
+backend/data/subscriptions.json
+backend/keys/
+venv/
+.venv/
+*.pem

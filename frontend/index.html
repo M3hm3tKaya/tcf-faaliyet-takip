@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#e94560">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>TCF Faaliyet Takip</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="header">
+    <h1>TCF Faaliyet Takip</h1>
+    <p>Türkiye Cimnastik Federasyonu</p>
+  </div>
+
+  <div id="notif-bar" class="notification-bar"></div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="num" id="stat-toplam">-</div>
+      <div class="label">Toplam</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-yarisma">-</div>
+      <div class="label">Yarışma</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-kurs">-</div>
+      <div class="label">Kurs</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-kamp">-</div>
+      <div class="label">Kamp</div>
+    </div>
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Faaliyet ara...">
+  </div>
+
+  <div class="controls">
+    <select id="filtre-kategori">
+      <option value="">Tüm Kategoriler</option>
+      <option value="Yarışma">Yarışma</option>
+      <option value="Kurs">Kurs</option>
+      <option value="Kamp">Kamp</option>
+      <option value="Seminer">Seminer</option>
+      <option value="Faaliyet Programı">Faaliyet Programı</option>
+      <option value="Sonuçlar">Sonuçlar</option>
+    </select>
+    <select id="filtre-brans">
+      <option value="">Tüm Branşlar</option>
+      <option value="Erkek Artistik Cimnastik">Erkek Artistik</option>
+      <option value="Kadın Artistik Cimnastik">Kadın Artistik</option>
+      <option value="Ritmik Cimnastik">Ritmik</option>
+      <option value="Trampolin Cimnastik">Trampolin</option>
+      <option value="Aerobik Cimnastik">Aerobik</option>
+      <option value="Parkur">Parkur</option>
+      <option value="Akrobatik Cimnastik">Akrobatik</option>
+      <option value="Pilates">Pilates</option>
+      <option value="Step">Step</option>
+      <option value="Step - Aerobik">Step-Aerobik</option>
+      <option value="Genel Cimnastik Hareket Eğitimi">Genel Cimnastik</option>
+    </select>
+    <button id="btn-reset">Sıfırla</button>
+  </div>
+
+  <div class="list" id="list">
+    <div class="loading">Yükleniyor...</div>
+  </div>
+
+  <div class="footer">
+    TCF Faaliyet Takip &mdash; Veriler tcf.gov.tr'den alınmaktadır.
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

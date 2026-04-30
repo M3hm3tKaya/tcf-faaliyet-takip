@@ -1,0 +1,291 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #f5f5f7;
+  --card: #ffffff;
+  --accent: #d6293e;
+  --accent-light: #fef2f2;
+  --accent2: #1d4ed8;
+  --text: #1a1a1a;
+  --text-secondary: #555;
+  --muted: #888;
+  --border: #e5e7eb;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --success: #16a34a;
+  --kurs: #ea580c;
+  --yarisma: #d6293e;
+  --kamp: #0891b2;
+  --seminer: #7c3aed;
+  --program: #16a34a;
+  --sonuc: #64748b;
+}
+
+body {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.header {
+  background: #ffffff;
+  padding: 16px 20px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid var(--accent);
+  box-shadow: var(--shadow);
+}
+
+.header h1 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.header p {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.notification-bar {
+  display: none;
+  padding: 10px 16px;
+  background: var(--accent-light);
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.notification-bar.show {
+  display: block;
+}
+
+.notification-bar.subscribed {
+  background: #f0fdf4;
+  color: var(--success);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px 12px 4px;
+}
+
+.stat-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.stat-card .num {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stat-card .label {
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-top: 1px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.search-box {
+  padding: 8px 12px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.85rem;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.search-box input::placeholder {
+  color: var(--muted);
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  padding: 4px 12px 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.controls::-webkit-scrollbar {
+  display: none;
+}
+
+.controls select,
+.controls button {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  -webkit-appearance: none;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.controls select {
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.controls button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.controls button:active {
+  opacity: 0.85;
+}
+
+.list {
+  padding: 4px 12px 12px;
+}
+
+.faaliyet-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 8px;
+  border-left: 4px solid var(--accent);
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s, transform 0.1s;
+}
+
+.faaliyet-card:active {
+  transform: scale(0.99);
+  box-shadow: var(--shadow-md);
+}
+
+.faaliyet-card .baslik {
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.faaliyet-card .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 0.72rem;
+}
+
+.faaliyet-card .tag {
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.tag-kategori {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.tag-brans {
+  background: #eff6ff;
+  color: var(--accent2);
+}
+
+.tag-yer {
+  background: #f0fdf4;
+  color: var(--success);
+}
+
+.tag-tarih {
+  background: #f8fafc;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+.faaliyet-card[data-kategori="Kurs"] { border-left-color: var(--kurs); }
+.faaliyet-card[data-kategori="Kurs"] .tag-kategori { background: #fff7ed; color: var(--kurs); }
+
+.faaliyet-card[data-kategori="Yarışma"] { border-left-color: var(--yarisma); }
+
+.faaliyet-card[data-kategori="Kamp"] { border-left-color: var(--kamp); }
+.faaliyet-card[data-kategori="Kamp"] .tag-kategori { background: #ecfeff; color: var(--kamp); }
+
+.faaliyet-card[data-kategori="Seminer"] { border-left-color: var(--seminer); }
+.faaliyet-card[data-kategori="Seminer"] .tag-kategori { background: #f5f3ff; color: var(--seminer); }
+
+.faaliyet-card[data-kategori="Faaliyet Programı"] { border-left-color: var(--program); }
+.faaliyet-card[data-kategori="Faaliyet Programı"] .tag-kategori { background: #f0fdf4; color: var(--program); }
+
+.faaliyet-card[data-kategori="Sonuçlar"] { border-left-color: var(--sonuc); }
+.faaliyet-card[data-kategori="Sonuçlar"] .tag-kategori { background: #f8fafc; color: var(--sonuc); }
+
+.empty,
+.loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.footer {
+  text-align: center;
+  padding: 16px 20px 24px;
+  font-size: 0.7rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+@media (min-width: 768px) {
+  .stats {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .search-box,
+  .controls,
+  .list {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .header h1 {
+    font-size: 1.4rem;
+  }
+}
