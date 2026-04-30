@@ -7,3 +7,4 @@ backend/keys/
 venv/
 .venv/
 *.pem
+node_modules/

@@ -256,6 +256,71 @@ body {
 .faaliyet-card[data-kategori="Sonuçlar"] { border-left-color: var(--sonuc); }
 .faaliyet-card[data-kategori="Sonuçlar"] .tag-kategori { background: #f8fafc; color: var(--sonuc); }
 
+.send-box {
+  margin: 8px 12px;
+  padding: 12px;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.send-row {
+  display: flex;
+  gap: 8px;
+}
+
+.send-row input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.send-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.send-row button {
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.send-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.send-row button:active:not(:disabled) {
+  opacity: 0.85;
+}
+
+.send-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+#send-status {
+  font-weight: 500;
+}
+
+#send-status.success { color: var(--success); }
+#send-status.error { color: var(--accent); }
+
 .empty,
 .loading {
   text-align: center;
@@ -278,6 +343,7 @@ body {
     max-width: 600px;
     margin: 0 auto;
   }
+  .send-box,
   .search-box,
   .controls,
   .list {

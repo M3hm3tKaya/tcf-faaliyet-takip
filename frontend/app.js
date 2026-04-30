@@ -10,6 +10,10 @@ const statToplam = document.getElementById("stat-toplam");
 const statYarisma = document.getElementById("stat-yarisma");
 const statKurs = document.getElementById("stat-kurs");
 const statKamp = document.getElementById("stat-kamp");
+const sendInput = document.getElementById("send-input");
+const btnSend = document.getElementById("btn-send");
+const charCount = document.getElementById("char-count");
+const sendStatus = document.getElementById("send-status");
 
 async function loadFaaliyetler() {
   listEl.innerHTML = '<div class="loading">Yükleniyor...</div>';
@@ -84,6 +88,43 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   applyFilters();
 });
 
+// --- Bildirim gönderme ---
+
+sendInput.addEventListener("input", () => {
+  charCount.textContent = `${sendInput.value.length}/100`;
+});
+
+btnSend.addEventListener("click", async () => {
+  const msg = sendInput.value.trim();
+  if (!msg) return;
+
+  btnSend.disabled = true;
+  sendStatus.textContent = "Gönderiliyor...";
+  sendStatus.className = "";
+
+  try {
+    const resp = await fetch("/api/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: msg }),
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      sendStatus.textContent = `${data.sent} kişiye gönderildi`;
+      sendStatus.className = "success";
+      sendInput.value = "";
+      charCount.textContent = "0/100";
+    } else {
+      sendStatus.textContent = data.error || "Gönderilemedi";
+      sendStatus.className = "error";
+    }
+  } catch {
+    sendStatus.textContent = "Bağlantı hatası";
+    sendStatus.className = "error";
+  }
+  btnSend.disabled = false;
+});
+
 // --- Push Notification ---
 
 async function setupPush() {
@@ -113,7 +154,7 @@ async function setupPush() {
         return;
       }
 
-      const keyResp = await fetch("/api/vapid-public-key");
+      const keyResp = await fetch("/api/vapid-key");
       const { publicKey } = await keyResp.json();
 
       const subscription = await reg.pushManager.subscribe({
