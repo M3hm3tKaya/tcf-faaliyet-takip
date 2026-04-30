@@ -14,10 +14,7 @@ const statKamp = document.getElementById("stat-kamp");
 async function loadFaaliyetler() {
   listEl.innerHTML = '<div class="loading">Yükleniyor...</div>';
   try {
-    let resp = await fetch("/api/faaliyetler").catch(() => null);
-    if (!resp || !resp.ok) {
-      resp = await fetch("/data/faaliyetler.json");
-    }
+    const resp = await fetch("/faaliyetler.json");
     const data = await resp.json();
     allFaaliyetler = data.faaliyetler;
     updateStats();

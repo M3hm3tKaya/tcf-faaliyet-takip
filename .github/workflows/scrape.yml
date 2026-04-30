@@ -4,12 +4,14 @@ on:
   schedule:
     - cron: '0 */6 * * *'
   workflow_dispatch:
+  push:
+    branches: [master]
 
 permissions:
   contents: write
 
 jobs:
-  scrape:
+  scrape-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,14 +28,19 @@ jobs:
         run: python scraper.py
 
       - name: Copy data to frontend
-        run: |
-          mkdir -p frontend/data
-          cp backend/data/faaliyetler.json frontend/data/faaliyetler.json
+        run: cp backend/data/faaliyetler.json frontend/faaliyetler.json
 
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add frontend/data/faaliyetler.json backend/data/faaliyetler.json
+          git add frontend/faaliyetler.json backend/data/faaliyetler.json
           git diff --staged --quiet || git commit -m "chore: faaliyetler güncellendi [bot]"
           git push
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy frontend --project-name tcf-takip --commit-dirty=true
