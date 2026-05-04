@@ -127,9 +127,25 @@ export default {
 };
 
 async function sendPushAll(env, eklenenler) {
-  // Worker'dan push göndermek için web-push kullanamaız,
-  // Pages Functions'daki /api/send endpoint'ini tetikleriz
-  // ya da doğrudan KV'deki subscription'lara gönderilir
-  // Bu kısım ileride geliştirilebilir
-  console.log(`${eklenenler.length} yeni faaliyet tespit edildi.`);
+  const count = eklenenler.length;
+  let message;
+  if (count === 1) {
+    const f = eklenenler[0];
+    message = `${f.baslik} (${f.brans}, ${f.yer})`;
+  } else {
+    const basliklar = eklenenler.slice(0, 2).map((f) => f.baslik).join(", ");
+    message = `${count} yeni: ${basliklar}`;
+  }
+
+  try {
+    const resp = await fetch("https://tcf.mhtbilisim.com/api/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: message.slice(0, 100) }),
+    });
+    const data = await resp.json();
+    console.log(`Push sonuç: ${data.sent || 0} kişiye gönderildi`);
+  } catch (e) {
+    console.error("Push gönderme hatası:", e);
+  }
 }
